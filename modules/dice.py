@@ -9,7 +9,7 @@ class dice():
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(description="roll dice in NdN format.")
+    @commands.command(description="roll dice in NdN+X format.")
     async def roll(self, dice : str):
         mod = -1
         try:

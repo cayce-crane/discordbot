@@ -13,17 +13,17 @@ class comic():
         self.bot = bot
 
     @commands.command(description = "Get an achewood")
-    async def achewood(self, *arg):
+    async def achewood(self, *search):
         result = ""
         # If no search argument is supplied, grab a random strip using urllib and lxml
-        if len(arg) == 0:
+        if len(search) == 0:
             page = urllib.request.urlopen('http://www.ohnorobot.com/random.pl?comic=636')
             doc = lxml.html.parse(page)
             imgurl = doc.xpath('//img/@src')
             result =  'http://www.achewood.com' + imgurl[1]
         else:
             # if there's a search term, first turn it into a searchable string
-            search = ' '.join(arg)
+            search = ' '.join(search)
             search = search.replace('"', '')
             search = quote(search)
             # run the search with ohnorobot

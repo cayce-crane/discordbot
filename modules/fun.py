@@ -14,7 +14,7 @@ class fun():
         await self.bot.say(":trumpet:" * 200)
 
     #translate text to full width
-    @commands.command(description='For when you wanna settle the score some other way')
+    @commands.command(description='As wide as text will get.')
     async def ominous(self, text : str):
         ominous_text = ""
         for c in text:
