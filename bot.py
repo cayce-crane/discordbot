@@ -35,6 +35,7 @@ async def on_ready():
     bot.load_extension("dice")
     bot.load_extension("codephrase")
     bot.load_extension('comic')
+    bot.load_extension('generators')
 
 
 @bot.event
