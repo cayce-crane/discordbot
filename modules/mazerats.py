@@ -8,6 +8,21 @@ class Character():
         cursor = connection.cursor()
 
         self.gender = rand.randint(0,1)
+        self.firstname = ""
+        self.surname = ""
+
+        if self.gender == 0:
+            cursor.execute("SELECT Name from FemaleNames WHERE NameID =" + str(rand.randint(1,36)))
+        else:
+            cursor.execute("SELECT Name from MaleNames WHERE NameID =" + str(rand.randint(1,36)))
+        self.firstname = cursor.fetchone()[0]
+
+        coin = rand.randint(0,1)
+        if coin == 0:
+            cursor.execute("SELECT Name FROM UpperSurnames WHERE NameID =" + str(rand.randint(1,36)))
+        else: 
+            cursor.execute("SELECT Name FROM LowerSurnames WHERE NameID =" + str(rand.randint(1,36)))
+        self.surname = cursor.fetchone()[0]
 
         self.abilities = {
             1 : ("+2", "+1", "+0"), 
@@ -25,13 +40,12 @@ class Character():
         }[rand.randint(1,3)]
 
         if self.startfeature == "Path - ":
-            self.path = {
-                1 : "Briarborn: Tracking, foraging, survival.",
-                2 : "Fingersmith: Tinkering, picking locks or pockets",
-                3 : "Roofrunner: Climbing, leaping, balancing.",
-                4 : "Shadowjack: Moving silently, hiding in shadows."
+            self.startfeature = {
+                1 : "Briarborn - Tracking, foraging, survival.",
+                2 : "Fingersmith - Tinkering, picking locks or pockets",
+                3 : "Roofrunner - Climbing, leaping, balancing.",
+                4 : "Shadowjack - Moving silently, hiding in shadows."
             }[rand.randint(1,4)]
-            self.startfeature += self.path
 
         self.items = []
         for i in range(0, 6):
@@ -63,7 +77,8 @@ class Character():
         self.manner = cursor.fetchone()[0]
 
     def returnChar(self):
-        self.thechar = "Abilities: Strength = " + self.abilities[0] + ", Dexterity = " + self.abilities[1] \
+        self.thechar = self.firstname + " " + self.surname \
+        + "\nAbilities: Strength = " + self.abilities[0] + ", Dexterity = " + self.abilities[1] \
             + ", Will = " + self.abilities[2] \
         + "\nStarting feature: " + self.startfeature \
         + "\nItems: " + ", ".join(self.items) \
