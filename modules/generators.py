@@ -14,16 +14,16 @@ class generators():
     @commands.command(description="Generate a variety of things. Syntax: ']random <schema> <argument>' \n " \
         "e.g. ']random mazerats character'")
     async def random(self, schema : str, arg : str):
-        try:
-            if schema == 'mazerats':
-                if arg == 'character':
-                    result = prefix.choosePrefix()
-                    ch = Character()
-                    result += ch.returnChar()
-                    await self.bot.say(result)
-        except Exception:
-            await self.bot.say('Format must be "]random <schema> <argument>".')
-            return
+     #   try:
+        if schema == 'mazerats':
+            if arg == 'character':
+                result = prefix.choosePrefix()
+                ch = Character()
+                result += ch.returnChar()
+                await self.bot.say(result)
+     #   except Exception:
+      #      await self.bot.say('Format must be "]random <schema> <argument>".')
+      #      return
 
 
 def setup(bot):

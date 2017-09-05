@@ -1,6 +1,9 @@
 import pypyodbc
 import random as rand
 
+
+### TODO: Break generating bits into discrete static functions
+
 class Character():
 
     def __init__(self): 
@@ -58,6 +61,19 @@ class Character():
                     self.items.append(result)
                     break
 
+        self.weapons = []
+        for i in range(0, 2):
+            while True:
+                choice = rand.randint(1, 18)
+                query = "SELECT WeaponName, WeaponType FROM Weapons WHERE WeaponID =" + str(choice)
+                cursor.execute(query)
+                res = cursor.fetchone()
+                weap = res[0]
+                wtype = res[1]
+                if weap not in self.weapons:
+                    self.weapons.append(str(weap + " (" + wtype + ")"))
+                    break
+
         cursor.execute("SELECT AppearanceName FROM Appearance WHERE AppearanceID =" + str(rand.randint(1,36)))
         self.appearance = cursor.fetchone()[0]
 
@@ -78,10 +94,11 @@ class Character():
 
     def returnChar(self):
         self.thechar = self.firstname + " " + self.surname \
-        + "\nAbilities: Strength = " + self.abilities[0] + ", Dexterity = " + self.abilities[1] \
-            + ", Will = " + self.abilities[2] \
+        + "\nAbilities: Strength " + self.abilities[0] + ", Dexterity " + self.abilities[1] \
+            + ", Will " + self.abilities[2] \
         + "\nStarting feature: " + self.startfeature \
         + "\nItems: " + ", ".join(self.items) \
+        + "\nWeapons: " + ", ".join(self.weapons) \
         + "\nAppearance: " + self.appearance \
         + "\nPhysical detail: " + self.physdetail \
         + "\nBackground: " + self.bg \
