@@ -8,24 +8,24 @@ class Character():
 
     def __init__(self): 
         connection  = pypyodbc.connect("Driver={SQL Server};Server=localhost;Database=MazeRats;Trusted_Connection=Yes;")
-        cursor = connection.cursor()
+        self.cursor = connection.cursor()
 
         self.gender = rand.randint(0,1)
         self.firstname = ""
         self.surname = ""
 
         if self.gender == 0:
-            cursor.execute("SELECT Name from FemaleNames WHERE NameID =" + str(rand.randint(1,36)))
+            self.cursor.execute("SELECT Name from FemaleNames WHERE NameID =" + str(rand.randint(1,36)))
         else:
-            cursor.execute("SELECT Name from MaleNames WHERE NameID =" + str(rand.randint(1,36)))
-        self.firstname = cursor.fetchone()[0]
+            self.cursor.execute("SELECT Name from MaleNames WHERE NameID =" + str(rand.randint(1,36)))
+        self.firstname = self.cursor.fetchone()[0]
 
         coin = rand.randint(0,1)
         if coin == 0:
-            cursor.execute("SELECT Name FROM UpperSurnames WHERE NameID =" + str(rand.randint(1,36)))
+            self.cursor.execute("SELECT Name FROM UpperSurnames WHERE NameID =" + str(rand.randint(1,36)))
         else: 
-            cursor.execute("SELECT Name FROM LowerSurnames WHERE NameID =" + str(rand.randint(1,36)))
-        self.surname = cursor.fetchone()[0]
+            self.cursor.execute("SELECT Name FROM LowerSurnames WHERE NameID =" + str(rand.randint(1,36)))
+        self.surname = self.cursor.fetchone()[0]
 
         self.abilities = {
             1 : ("+2", "+1", "+0"), 
@@ -50,13 +50,17 @@ class Character():
                 4 : "Shadowjack - Moving silently, hiding in shadows."
             }[rand.randint(1,4)]
 
+        if self.startfeature == "One spell slot":
+            self.spell = self.randomSpell()
+            self.startfeature += " - " + self.spell
+
         self.items = []
         for i in range(0, 6):
             while True:
                 choice = rand.randint(1,36)
                 query = "SELECT GearName FROM StartingGear WHERE GearID =" + str(choice)
-                cursor.execute(query)
-                result = cursor.fetchone()[0]
+                self.cursor.execute(query)
+                result = self.cursor.fetchone()[0]
                 if result not in self.items:
                     self.items.append(result)
                     break
@@ -66,31 +70,31 @@ class Character():
             while True:
                 choice = rand.randint(1, 18)
                 query = "SELECT WeaponName, WeaponType FROM Weapons WHERE WeaponID =" + str(choice)
-                cursor.execute(query)
-                res = cursor.fetchone()
+                self.cursor.execute(query)
+                res = self.cursor.fetchone()
                 weap = res[0]
                 wtype = res[1]
                 if weap not in self.weapons:
                     self.weapons.append(str(weap + " (" + wtype + ")"))
                     break
 
-        cursor.execute("SELECT AppearanceName FROM Appearance WHERE AppearanceID =" + str(rand.randint(1,36)))
-        self.appearance = cursor.fetchone()[0]
+        self.cursor.execute("SELECT AppearanceName FROM Appearance WHERE AppearanceID =" + str(rand.randint(1,36)))
+        self.appearance = self.cursor.fetchone()[0]
 
-        cursor.execute("SELECT DetailName FROM PhysicalDetail WHERE DetailID =" + str(rand.randint(1,36)))
-        self.physdetail = cursor.fetchone()[0]
+        self.cursor.execute("SELECT DetailName FROM PhysicalDetail WHERE DetailID =" + str(rand.randint(1,36)))
+        self.physdetail = self.cursor.fetchone()[0]
 
-        cursor.execute("SELECT BackgroundName FROM Background WHERE BackgroundID =" + str(rand.randint(1,36)))
-        self.bg = cursor.fetchone()[0]
+        self.cursor.execute("SELECT BackgroundName FROM Background WHERE BackgroundID =" + str(rand.randint(1,36)))
+        self.bg = self.cursor.fetchone()[0]
 
-        cursor.execute("SELECT ClothingName FROM Clothing WHERE ClothingID =" + str(rand.randint(1,36)))
-        self.clothing = cursor.fetchone()[0]
+        self.cursor.execute("SELECT ClothingName FROM Clothing WHERE ClothingID =" + str(rand.randint(1,36)))
+        self.clothing = self.cursor.fetchone()[0]
 
-        cursor.execute("SELECT PersonalityName FROM Personality WHERE PersonalityID =" + str(rand.randint(1,36)))
-        self.person = cursor.fetchone()[0]
+        self.cursor.execute("SELECT PersonalityName FROM Personality WHERE PersonalityID =" + str(rand.randint(1,36)))
+        self.person = self.cursor.fetchone()[0]
 
-        cursor.execute("SELECT MannerismName FROM Mannerism WHERE MannerismID =" + str(rand.randint(1,36)))
-        self.manner = cursor.fetchone()[0]
+        self.cursor.execute("SELECT MannerismName FROM Mannerism WHERE MannerismID =" + str(rand.randint(1,36)))
+        self.manner = self.cursor.fetchone()[0]
 
     def returnChar(self):
         self.thechar = self.firstname + " " + self.surname \
@@ -106,3 +110,71 @@ class Character():
         + "\nPersonality: " + self.person \
         + "\nMannerism: " + self.manner
         return self.thechar
+
+
+
+    def randomSpell(self):
+        spelltype = rand.randint(1,12)
+
+        if spelltype == 1:
+            self.cursor.execute("SELECT SName FROM SpellPhysicalEffects WHERE SID =" + str(rand.randint(1,36)))
+            spell = self.cursor.fetchone()[0]
+            self.cursor.execute("SELECT SName FROM SpellPhysicalForms WHERE SID =" + str(rand.randint(1,36)))
+            spell += " " + self.cursor.fetchone()[0]
+        elif spelltype == 2:
+            self.cursor.execute("SELECT SName FROM SpellPhysicalEffects WHERE SID =" + str(rand.randint(1,36)))
+            spell = self.cursor.fetchone()[0]
+            self.cursor.execute("SELECT SName FROM SpellEtherealForms WHERE SID =" + str(rand.randint(1,36)))
+            spell += " " + self.cursor.fetchone()[0]
+        elif spelltype == 3:
+            self.cursor.execute("SELECT SName FROM SpellEtherealEffects WHERE SID =" + str(rand.randint(1,36)))
+            spell = self.cursor.fetchone()[0]
+            self.cursor.execute("SELECT SName FROM SpellPhysicalForms WHERE SID =" + str(rand.randint(1,36)))
+            spell += " " + self.cursor.fetchone()[0]
+        elif spelltype == 4:
+            self.cursor.execute("SELECT SName FROM SpellEtherealEffects WHERE SID =" + str(rand.randint(1,36)))
+            spell = self.cursor.fetchone()[0]
+            self.cursor.execute("SELECT SName FROM SpellEtherealForms WHERE SID =" + str(rand.randint(1,36)))
+            spell += " " + self.cursor.fetchone()[0]
+        elif spelltype == 5:
+            self.cursor.execute("SELECT SName FROM SpellPhysicalElements WHERE SID =" + str(rand.randint(1,36)))
+            spell = self.cursor.fetchone()[0]
+            self.cursor.execute("SELECT SName FROM SpellPhysicalForms WHERE SID =" + str(rand.randint(1,36)))
+            spell += " " + self.cursor.fetchone()[0]
+        elif spelltype == 6:
+            self.cursor.execute("SELECT SName FROM SpellPhysicalElements WHERE SID =" + str(rand.randint(1,36)))
+            spell = self.cursor.fetchone()[0]
+            self.cursor.execute("SELECT SName FROM SpellEtherealForms WHERE SID =" + str(rand.randint(1,36)))
+            spell += " " + self.cursor.fetchone()[0]
+        elif spelltype == 7:
+            self.cursor.execute("SELECT SName FROM SpellEtherealElements WHERE SID =" + str(rand.randint(1,36)))
+            spell = self.cursor.fetchone()[0]
+            self.cursor.execute("SELECT SName FROM SpellPhysicalForms WHERE SID =" + str(rand.randint(1,36)))
+            spell += " " + self.cursor.fetchone()[0]
+        elif spelltype == 8:
+            self.cursor.execute("SELECT SName FROM SpellEtherealElements WHERE SID =" + str(rand.randint(1,36)))
+            spell = self.cursor.fetchone()[0]
+            self.cursor.execute("SELECT SName FROM SpellEtherealForms WHERE SID =" + str(rand.randint(1,36)))
+            spell += " " + self.cursor.fetchone()[0]
+        elif spelltype == 9:
+            self.cursor.execute("SELECT SName FROM SpellPhysicalEffects WHERE SID =" + str(rand.randint(1,36)))
+            spell = self.cursor.fetchone()[0]
+            self.cursor.execute("SELECT SName FROM SpellPhysicalElements WHERE SID =" + str(rand.randint(1,36)))
+            spell += " " + self.cursor.fetchone()[0]
+        elif spelltype == 10:
+            self.cursor.execute("SELECT SName FROM SpellPhysicalEffects WHERE SID =" + str(rand.randint(1,36)))
+            spell = self.cursor.fetchone()[0]
+            self.cursor.execute("SELECT SName FROM SpellEtherealElements WHERE SID =" + str(rand.randint(1,36)))
+            spell += " " + self.cursor.fetchone()[0]
+        elif spelltype == 11:
+            self.cursor.execute("SELECT SName FROM SpellEtherealEffects WHERE SID =" + str(rand.randint(1,36)))
+            spell = self.cursor.fetchone()[0]
+            self.cursor.execute("SELECT SName FROM SpellPhysicalElements WHERE SID =" + str(rand.randint(1,36)))
+            spell += " " + self.cursor.fetchone()[0]
+        elif spelltype == 12:
+            self.cursor.execute("SELECT SName FROM SpellEtherealEffects WHERE SID =" + str(rand.randint(1,36)))
+            spell = self.cursor.fetchone()[0]
+            self.cursor.execute("SELECT SName FROM SpellEtherealElements WHERE SID =" + str(rand.randint(1,36)))
+            spell += " " + self.cursor.fetchone()[0]
+
+        return spell
